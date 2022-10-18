@@ -3,7 +3,7 @@ from math import sqrt
 
 Coordenada = namedtuple('Coordenada', 'latitud, longitud')
 
-def lee_datos(archivo):
+def lee_coordenadas(archivo):
     coordenadas = []
     with open(archivo, encoding='utf-8') as f:
         next(f)
