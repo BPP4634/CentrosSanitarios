@@ -18,14 +18,14 @@ def lee_datos(archivo):
             tiene_uci = bool(linea[7])
             centros.append(CentroSanitario(nombre, localidad, coordenada, estado, num_camas, acceso_minusvalidos, tiene_uci))
         return centros
-'''leer_centros: recibe la ruta de un fichero CSV codificado en UTF-8, y devuelve una lista de tuplas de
-tipo CentroSanitario(str, str, Coordenada(float, float), str, int, bool, bool) conteniendo todos los datos
-almacenados en el fichero. Note que, aunque en el fichero la latitud y la longitud se almacenan de
-forma independiente, en la lista resultado deben almacenarse como una Coordenada(float, float).
-2. calcular_total_camas_centros_accesibles: recibe una lista de tuplas de tipo CentroSanitario, y
-produce como salida un entero correspondiente al número total de camas de los centros sanitarios
-accesibles para discapacitados.
-3. obtener_centros_con_uci_cercanos_a: recibe una lista de tuplas de tipo CentroSanitario, una tupla
+
+def calcular_total_camas_centros_accesibles(centros):
+    camas = []
+    for centro in centros:
+        if centro.acceso_minusvalidos == True:
+            camas.append(centro.num_camas)
+    return sum(camas)
+'''3. obtener_centros_con_uci_cercanos_a: recibe una lista de tuplas de tipo CentroSanitario, una tupla
 de tipo Coordenada que representa un punto, y un float que representa un umbral de distancia, y
 produce como salida una lista de tuplas (str, str, Coordenada(float, float)) con el nombre, la localidad
 y las coordenadas de los centros situados a una distancia de las coordenadas dadas como parámetro
