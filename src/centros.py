@@ -34,6 +34,13 @@ def obtener_centros_con_uci_cercanos_a(centros, coor,n):
             centroscerca.append((centro.nombre,centro.localidad,centro.coordenada))
     return centroscerca
 
+def obtener_centros_con_uci_cercanos_a_haversine(centros, coor,n):
+    centroscerca = []
+    for centro in centros:
+        if distancia_harvesine(centro.coordenada, coor) <=n:
+            centroscerca.append((centro.nombre,centro.localidad,centro.coordenada))
+    return centroscerca
+
 def generar_mapa(centros):
     coor = []
     for centro in centros:
@@ -45,6 +52,25 @@ def generar_mapa(centros):
         marcador = crea_marcador(centro[2].latitud,centro[2].longitud,centro[0])
         marcador.add_to(mapa)
     mapa.save('./out/mapa.html')
+
+def obtener_centros_con_uci_cercanos_a_haversine(centros, coor,n):
+    centroscerca = []
+    for centro in centros:
+        if distancia_harvesine(centro.coordenada, coor) <=n:
+            centroscerca.append((centro.nombre,centro.localidad,centro.coordenada))
+    return centroscerca
+
+def generar_mapa_haversine(centros):
+    coor = []
+    for centro in centros:
+        coor.append(centro[2])
+    print(coor)
+    media = calcular_media_coordenadas(coor)
+    mapa = crea_mapa(media.latitud,media.longitud)
+    for centro in centros:
+        marcador = crea_marcador(centro[2].latitud,centro[2].longitud,centro[0])
+        marcador.add_to(mapa)
+    mapa.save('./out/mapa_haversine.html')
 
 '''4. generar_mapa: recibe una lista de tuplas (str, str, Coordenada(float, float)) con el nombre, la
 localidad y las coordenadas de los centros, y una cadena que representa la ruta de un fichero html,

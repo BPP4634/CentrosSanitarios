@@ -1,4 +1,5 @@
 from collections import namedtuple
+from math import sin, cos, sqrt, atan2, radians
 from math import sqrt
 
 Coordenada = namedtuple('Coordenada', 'latitud, longitud')
@@ -26,7 +27,12 @@ def calcular_media_coordenadas(coordenadas):
         longitudes.append(coordenada.longitud)
     return Coordenada(sum(latitudes)/len(latitudes), sum(longitudes)/len(longitudes))
 
-
-'''2. calcular_media_coordenadas: recibe una lista de Coordenada(float, float), y devuelve una
-Coordenada(float, float) cuya latitud es la media de las latitudes de la lista y cuya longitud es la media
-de las longitudes de la lista.'''
+def distancia_harvesine(coord_a, coord_b):
+    radio_tierra = 6373.0
+    latitud_a, longitud_a = radians(coord_a.latitud), radians(coord_a.longitud)
+    latitud_b, longitud_b = radians(coord_b.latitud), radians(coord_b.longitud)    
+    inc_lat  = latitud_b - latitud_a
+    inc_long = longitud_b - longitud_a
+    a = sin(inc_lat / 2)**2 + cos(latitud_a) * cos(latitud_b) * sin(inc_long / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    return radio_tierra * c
