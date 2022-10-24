@@ -1,4 +1,5 @@
 from collections import namedtuple
+import csv
 from coordenadas import *
 from mapas import *
 
@@ -7,16 +8,13 @@ CentroSanitario = namedtuple('CentroSanitario', 'nombre, localidad, coordenada, 
 def lee_datos(archivo):
     centros = []
     with open(archivo, encoding='utf-8') as f:
-        next(f)
-        for linea in f:
-            linea = linea.split(";")
-            nombre = linea[0]
-            localidad = linea[1]
-            coordenada = Coordenada(float(linea[2]),float(linea[3]))
-            estado = linea[4]
-            num_camas = int(linea[5])
-            acceso_minusvalidos = bool(linea[6])
-            tiene_uci = bool(linea[7])
+        lector = csv.reader(f, delimiter=';')
+        next(lector)
+        for nombre, localidad, latitud, longitud, estado, num_camas, acceso_minusvalidos, tiene_uci in lector:
+            coordenada = Coordenada(float(latitud),float(longitud))
+            num_camas = int(num_camas)
+            acceso_minusvalidos = acceso_minusvalidos.strip() =='true'
+            tiene_uci = tiene_uci.strip() =='true'
             centros.append(CentroSanitario(nombre, localidad, coordenada, estado, num_camas, acceso_minusvalidos, tiene_uci))
         return centros
 
@@ -30,28 +28,30 @@ def calcular_total_camas_centros_accesibles(centros):
 def obtener_centros_con_uci_cercanos_a(centros, coor,n):
     centroscerca = []
     for centro in centros:
-        if calcular_distancia(centro.coordenada, coor) <=n:
+        if calcular_distancia(centro.coordenada, coor) <=n and centro.tiene_uci:
             centroscerca.append((centro.nombre,centro.localidad,centro.coordenada))
     return centroscerca
 
 def obtener_centros_con_uci_cercanos_a_haversine(centros, coor,n):
     centroscerca = []
     for centro in centros:
-        if distancia_harvesine(centro.coordenada, coor) <=n:
+        if distancia_harvesine(centro.coordenada, coor) <=n and centro.tiene_uci:
             centroscerca.append((centro.nombre,centro.localidad,centro.coordenada))
     return centroscerca
 
-def generar_mapa(centros):
+def transforma_a_coordenadas(centros):
     coor = []
     for centro in centros:
         coor.append(centro[2])
-    print(coor)
-    media = calcular_media_coordenadas(coor)
+    return coor
+
+def generar_mapa(centros):
+    media = calcular_media_coordenadas(transforma_a_coordenadas(centros))
     mapa = crea_mapa(media.latitud,media.longitud)
     for centro in centros:
-        marcador = crea_marcador(centro[2].latitud,centro[2].longitud,centro[0])
+        marcador = crea_marcador(centro[2].latitud,centro[2].longitud,centro[0]+'-'+centro[1])
         marcador.add_to(mapa)
-    mapa.save('./out/mapa.html')
+    mapa.save('./data/centrosSanitarios.csv')
 
 def obtener_centros_con_uci_cercanos_a_haversine(centros, coor,n):
     centroscerca = []
@@ -68,7 +68,7 @@ def generar_mapa_haversine(centros):
     media = calcular_media_coordenadas(coor)
     mapa = crea_mapa(media.latitud,media.longitud)
     for centro in centros:
-        marcador = crea_marcador(centro[2].latitud,centro[2].longitud,centro[0])
+        marcador = crea_marcador(centro[2].latitud,centro[2].longitud,centro[0]+'-'+centro[1])
         marcador.add_to(mapa)
     mapa.save('./out/mapa_haversine.html')
 
